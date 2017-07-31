@@ -5,9 +5,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.database.sqlite.SQLiteOpenHelper;
 
-public class BalckDbHelper extends SQLiteOpenHelper {
+public class ShopDbHelper extends SQLiteOpenHelper {
 
-	public BalckDbHelper(Context context) {
+	public ShopDbHelper(Context context) {
 		super(context, DbConstants.DB_NAME, null, DbConstants.DB_VERSION);
 
 	}
