@@ -13,9 +13,14 @@ public class DbConstants {
     public static final String REMOTE_IP = "remoteip";
     public static final String LOGIN_NAME = "loginname";
     public static final String LOGIN_PSW = "loingpsw";
+    public static final String REMTOE_DB = "remotedb";
 
     public static final String CREATE_TABLE = "create table " + TABLE_NAME +
             " (_id integer primary key autoincrement," +
             "serialnum varchar(20) unique, price double)";
 
+    public static final String SHARED_PREFENCES = "dbinfo";
+    public static final int DB_NOT_EQAUL = -1;
+    public static final int DB_EMPTY = -2;
+    public static final int DB_EQUAL = 0;
 }

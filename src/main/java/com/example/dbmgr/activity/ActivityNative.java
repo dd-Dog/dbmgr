@@ -2,6 +2,7 @@ package com.example.dbmgr.activity;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -25,6 +26,7 @@ public class ActivityNative extends AppCompatActivity implements View.OnClickLis
     private EditText etAddSerial;
     private EditText etAddPrice;
     private LinearLayout llResult;
+    private TextView tvQueryResult;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +42,7 @@ public class ActivityNative extends AppCompatActivity implements View.OnClickLis
         findViewById(R.id.btn_query).setOnClickListener(this);
         findViewById(R.id.btn_update).setOnClickListener(this);
         tvResult = (TextView) findViewById(R.id.tv_result);
+        tvQueryResult = (TextView) findViewById(R.id.tv_query_result);
         etAddPrice = (EditText) findViewById(R.id.et_add_price);
         etAddSerial = (EditText) findViewById(R.id.et_add_serial);
         etDelSerial = (EditText) findViewById(R.id.et_del_serial);
@@ -67,7 +70,14 @@ public class ActivityNative extends AppCompatActivity implements View.OnClickLis
                 break;
             case R.id.btn_query:
                 String querySerail = etQuerySerial.getText().toString().trim();
-                int type = blackDAO.findType(querySerail);
+                String type = blackDAO.findType(querySerail);
+                if (TextUtils.isEmpty(type)) {
+                    tvQueryResult.setText("查询结果：\n 未查询到");
+                    Toast.makeText(this, "查询失败", Toast.LENGTH_SHORT).show();
+                } else {
+                    tvQueryResult.setText("查询结果：\n" + querySerail + ":" + type);
+                    Toast.makeText(this, "查询成功", Toast.LENGTH_SHORT).show();
+                }
                 updateData();
                 break;
             case R.id.btn_update:

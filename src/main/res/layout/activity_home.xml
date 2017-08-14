@@ -6,10 +6,10 @@
 
 
     <Button
-        android:layout_margin="16dp"
         android:id="@+id/btn_native"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="16dp"
         android:text="本地数据库管理" />
 
 
@@ -20,17 +20,19 @@
         android:background="#000" />
 
     <LinearLayout
-        android:padding="5dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
         android:background="#aaa"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="5dp">
 
         <TextView
-            android:text="提醒:远端主机所在网络与手机网络应该属于同一网段"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:text="远端主机所在网络与手机网络应该属于同一网段"
+            android:textColor="#f00" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -46,8 +48,25 @@
                 android:id="@+id/et_ip"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:inputType="number" />
+                android:layout_weight="1" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="5dp"
+                android:text="数据库名:" />
+
+            <EditText
+                android:id="@+id/et_database"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
         </LinearLayout>
 
         <LinearLayout
@@ -70,8 +89,7 @@
                     android:id="@+id/et_name"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:inputType="number" />
+                    android:layout_weight="1" />
             </LinearLayout>
 
             <LinearLayout
@@ -89,8 +107,7 @@
                     android:id="@+id/et_psw"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:inputType="number" />
+                    android:layout_weight="1" />
             </LinearLayout>
         </LinearLayout>
 
@@ -100,4 +117,32 @@
             android:layout_height="wrap_content"
             android:text="连接远端数据库" />
     </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:layout_marginTop="20dp"
+        android:background="#000" />
+
+    <LinearLayout
+        android:layout_margin="16dp"
+        android:layout_width="match_parent"
+        android:orientation="horizontal"
+        android:layout_height="wrap_content">
+        <Button
+            android:layout_margin="5dp"
+            android:id="@+id/btn_syncDown"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="下载数据" />
+        <Button
+            android:layout_margin="5dp"
+            android:id="@+id/btn_syncUp"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="上传数据" />
+    </LinearLayout>
+
 </LinearLayout>
