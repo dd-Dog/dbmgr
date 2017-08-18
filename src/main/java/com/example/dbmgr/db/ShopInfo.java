@@ -11,4 +11,12 @@ public class ShopInfo {
         this.serial = serial;
         this.price = price + "";
     }
+
+    @Override
+    public String toString() {
+        return "ShopInfo{" +
+                "serial='" + serial + '\'' +
+                ", price='" + price + '\'' +
+                '}';
+    }
 }

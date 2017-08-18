@@ -15,7 +15,7 @@ import com.example.dbmgr.db.ShopInfo;
 
 import java.util.ArrayList;
 
-public class ActivityNative extends AppCompatActivity implements View.OnClickListener {
+public class LocalActivity extends BaseActivity implements View.OnClickListener {
 
     private ShopDAO blackDAO;
     private TextView tvResult;
@@ -31,9 +31,13 @@ public class ActivityNative extends AppCompatActivity implements View.OnClickLis
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_native);
         initView();
         blackDAO = new ShopDAO(this);
+    }
+
+    @Override
+    public void setContentViewId() {
+        setContentView(R.layout.activity_native);
     }
 
     private void initView() {

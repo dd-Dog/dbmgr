@@ -1,3 +1,26 @@
 <resources>
     <string name="app_name">DbMgr</string>
+    <string name="label">数据库管理</string>
+    <string name="help">使用帮助</string>
+    <string name="copyright">\@Copyright-ddDog</string>
+    <string name="email">email-bianjb@flyscale.cn</string>
+    <string name="QQ">Q-775665043</string>
+
+    <array name="downItems">
+        <item>清除更新</item>
+        <item>追加更新</item>
+    </array>
+
+    <array name="upItems">
+        <item>清除更新</item>
+        <item>追加更新</item>
+    </array>
+
+    <array name="tips">
+        <item>1.功能：管理手机端数据库和远端数据库同步，远端数据库目前只支持SqlServer\n\n</item>
+        <item>2.本地和远端数据库中的表名相同：purchase;表中字段相同：serial,price\n\n</item>
+        <item>3.使用前应用保证远端已经创建数据表\n\n</item>
+        <item>4.同步分为下载和上传，下载指从远端同步到手机，对手机数据库进行操作，上传则相反</item>
+        <item>5.上传和下载分别设有两种同步模式：清除和追加；清除是指清除被操作的数据表，再添加;追加是指在被操作的数据表基础上进行合并</item>
+    </array>
 </resources>

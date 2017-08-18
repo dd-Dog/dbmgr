@@ -146,6 +146,7 @@ public class ShopDAO {
 
     /**
      * 获取所有列
+     *
      * @return
      */
     public List<String> getColumns() {
@@ -172,6 +173,62 @@ public class ShopDAO {
 //            }
         }
         return columns;
+    }
+
+    /**
+     * 清空本地表并添加
+     */
+    public void clearAndAdd(ArrayList<ShopInfo> remoteData) {
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        if (db != null) {
+            //清空表数据
+            db.execSQL("DELETE FROM " + DbConstants.TABLE_NAME);
+            //自增长ID为0
+            db.execSQL("update sqlite_sequence SET seq = 0 where name = '" + DbConstants.TABLE_NAME + "'");
+            //添加数据
+            ContentValues values = null;
+            ShopInfo shopInfo = null;
+            long id = -1;
+            for (int i = 0; i < remoteData.size(); i++) {
+                shopInfo = remoteData.get(i);
+                values = new ContentValues();
+                values.put("serialnum", shopInfo.serial);
+                values.put("price", shopInfo.price);
+                // 参1 表明 参2数据为空时的默认值 参3要添加的数据
+                id = db.insert(DbConstants.TABLE_NAME, null, values);
+                if (id <= 0) {
+                    Log.e(TAG, shopInfo + "添加失败");
+                }
+            }
+            db.close();
+        }
+    }
+
+    /**
+     * 向表中追加数据，如果有ID相同的则数据会被覆盖
+     */
+    public void append(ArrayList<ShopInfo> remoteData) {
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        if (db != null) {
+            //查询本地数据库
+            ArrayList<ShopInfo> infos = new ArrayList<ShopInfo>();
+            String sql = "select " + DbConstants.SERIAL_NUM + ","
+                    + DbConstants.PRICE + " from " + DbConstants.TABLE_NAME;
+            Cursor cursor = db.rawQuery(sql, null);
+            if (cursor != null) {
+                while (cursor.moveToNext()) {
+                    String number = cursor.getString(0);
+                    String type = cursor.getString(1);
+                    ShopInfo info = new ShopInfo(number, type);
+                    infos.add(info);
+                }
+                cursor.close();
+            }
+            db.close();
+            //对比并合并数据
+            ArrayList<ShopInfo> union = ArraysUtil.union(infos, remoteData);
+            clearAndAdd(union);
+        }
     }
 
     /**

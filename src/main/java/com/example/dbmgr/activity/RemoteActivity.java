@@ -2,7 +2,6 @@ package com.example.dbmgr.activity;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -11,7 +10,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.dbmgr.R;
-import com.example.dbmgr.db.ShopDAO;
 import com.example.dbmgr.db.ShopDAORemote;
 import com.example.dbmgr.db.ShopInfo;
 import com.example.dbmgr.utils.Task;
@@ -19,15 +17,13 @@ import com.example.dbmgr.utils.Task;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import static android.R.id.list;
-
 /**
  * Created by bianjb on 2017/7/31.
  */
 
-public class ActivityRemote extends AppCompatActivity implements View.OnClickListener {
+public class RemoteActivity extends BaseActivity implements View.OnClickListener {
 
-    private static final String TAG = "ActivityRemote";
+    private static final String TAG = "RemoteActivity";
     private TextView tvResult;
     private EditText etUpdatePrice;
     private EditText etUpdateSerial;
@@ -43,10 +39,8 @@ public class ActivityRemote extends AppCompatActivity implements View.OnClickLis
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_remote);
-        getSupportActionBar().setTitle("远端数据库管理");
         initView();
-        shopDAORemote = new ShopDAORemote(ActivityHome.conn, this);
+        shopDAORemote = new ShopDAORemote(HomeActivity.conn, this);
         Task.asyncTask(new Runnable() {
             @Override
             public void run() {
@@ -60,6 +54,11 @@ public class ActivityRemote extends AppCompatActivity implements View.OnClickLis
                 });
             }
         });
+    }
+
+    @Override
+    public void setContentViewId() {
+        setContentView(R.layout.activity_remote);
     }
 
     private void initView() {
@@ -94,7 +93,7 @@ public class ActivityRemote extends AppCompatActivity implements View.OnClickLis
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                Toast.makeText(ActivityRemote.this, add ? "添加成功" : "添加失败", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(RemoteActivity.this, add ? "添加成功" : "添加失败", Toast.LENGTH_SHORT).show();
                             }
                         });
                     }
@@ -109,7 +108,7 @@ public class ActivityRemote extends AppCompatActivity implements View.OnClickLis
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                Toast.makeText(ActivityRemote.this, delete ? "删除成功" : "删除失败", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(RemoteActivity.this, delete ? "删除成功" : "删除失败", Toast.LENGTH_SHORT).show();
                             }
                         });
                         updateData();
@@ -137,9 +136,9 @@ public class ActivityRemote extends AppCompatActivity implements View.OnClickLis
                                         result += shopInfo.price + "\n";
                                     }
                                     tvQueryResult.setText(result);
-                                    Toast.makeText(ActivityRemote.this, "查询成功", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(RemoteActivity.this, "查询成功", Toast.LENGTH_SHORT).show();
                                 } else {
-                                    Toast.makeText(ActivityRemote.this, "查询失败", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(RemoteActivity.this, "查询失败", Toast.LENGTH_SHORT).show();
                                 }
                             }
                         });
@@ -157,7 +156,7 @@ public class ActivityRemote extends AppCompatActivity implements View.OnClickLis
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                Toast.makeText(ActivityRemote.this, update ? "修改成功" : "修改失败", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(RemoteActivity.this, update ? "修改成功" : "修改失败", Toast.LENGTH_SHORT).show();
                             }
                         });
                     }
@@ -189,7 +188,7 @@ public class ActivityRemote extends AppCompatActivity implements View.OnClickLis
     protected void onDestroy() {
         super.onDestroy();
         try {
-            ActivityHome.conn.close();
+            HomeActivity.conn.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }

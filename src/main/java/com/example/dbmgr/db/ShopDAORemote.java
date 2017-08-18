@@ -1,8 +1,10 @@
 package com.example.dbmgr.db;
 
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.example.dbmgr.utils.ArraysUtil;
@@ -202,6 +204,73 @@ public class ShopDAORemote {
         }
         columns = ArraysUtil.sort(columns);
         return columns;
+    }
+
+    /**
+     * 清空远端表并添加
+     */
+    public void clearAndAdd(ArrayList<ShopInfo> localData) {
+        Statement stmt = null;
+        if (localData == null) return;
+        try {
+            if (conn == null || conn.isClosed())
+                conn = DriverManager.getConnection("jdbc:jtds:sqlserver://" + remoteIP + ":1433/" + remoteDb, loginName, loginPsw);
+            stmt = conn.createStatement();
+            //清空数据库,返回值false表示没有结果 ，也就是执行成功
+            boolean execute = stmt.execute("truncate table " + DbConstants.TABLE_NAME);
+            Log.e(TAG, !execute ? "清空远端数据库成功" : "清空远端数据库失败");
+            if (execute) return;
+            //添加数据
+            ShopInfo shopInfo;
+            PreparedStatement preparedStatement =
+                    conn.prepareStatement("INSERT INTO " + DbConstants.TABLE_NAME + " VALUES(?,?)");
+            for (int i = 0; i < localData.size(); i++) {
+                shopInfo = localData.get(i);
+                preparedStatement.setString(1, shopInfo.serial);
+                preparedStatement.setString(2, shopInfo.price);
+                int result = preparedStatement.executeUpdate();
+                if (result > 0) {
+                    Log.e(TAG, "添加成功");
+                } else {
+                    Log.e(TAG, "添加失败");
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (conn != null)
+                    conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * 向表中追加数据，如果有ID相同的则数据会被覆盖
+     */
+    public void append(ArrayList<ShopInfo> localData) {
+        Statement stmt;
+        ArrayList<ShopInfo> union = null;
+                //查询远端数据表
+        ArrayList<ShopInfo> remoteData = findAll();
+        try {
+            if (conn == null || conn.isClosed())
+                conn = DriverManager.getConnection("jdbc:jtds:sqlserver://" + remoteIP + ":1433/" + remoteDb, loginName, loginPsw);
+            //合并添加数据
+            union = ArraysUtil.union(remoteData, localData);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (conn != null)
+                    conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        clearAndAdd(union);
     }
 
     /**
