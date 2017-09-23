@@ -39,14 +39,14 @@ public class ActionBarView extends FrameLayout {
         init();
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.actionBarAttrs);
         String title = typedArray.getString(R.styleable.actionBarAttrs_title);
-        Drawable drawable = typedArray.getDrawable(R.styleable.actionBarAttrs_rightImage);
+//        Drawable drawable = typedArray.getDrawable(R.styleable.actionBarAttrs_rightImage);
         int color = typedArray.getColor(R.styleable.actionBarAttrs_actionbar_background,
                 context.getResources().getColor(R.color.green));
         typedArray.recycle();
         tvTitle.setText(title);
         tvTitle.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16);
         tvTitle.getPaint().setFakeBoldText(true);
-        rightImage.setImageDrawable(drawable);
+//        rightImage.setImageDrawable(drawable);
         actionBar.setBackgroundColor(color);
 
     }

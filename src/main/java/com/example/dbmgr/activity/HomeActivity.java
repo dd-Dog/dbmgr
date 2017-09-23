@@ -1,13 +1,18 @@
 package com.example.dbmgr.activity;
 
 import android.app.Dialog;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.hardware.usb.UsbManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -22,14 +27,21 @@ import com.example.dbmgr.db.DbConstants;
 import com.example.dbmgr.db.ShopDAO;
 import com.example.dbmgr.db.ShopDAORemote;
 import com.example.dbmgr.db.ShopInfo;
+import com.example.dbmgr.receiver.OTGBroadcastReceiver;
 import com.example.dbmgr.utils.ArraysUtil;
 import com.example.dbmgr.utils.Task;
+import com.github.mjdev.libaums.UsbMassStorageDevice;
+import com.github.mjdev.libaums.fs.FileSystem;
+import com.github.mjdev.libaums.fs.UsbFile;
+import com.github.mjdev.libaums.partition.Partition;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
+import static java.security.AccessController.getContext;
 
 /**
  * Created by bianjb on 2017/7/31.
@@ -59,6 +71,10 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener {
     private Spinner downSpinner;
     private Spinner upSpinner;
     private Dialog remoteConfigDialog;
+    private Dialog mEditRemoteConfigDialog;
+    private int currentMotivation;
+    private AlertDialog mAlertDialog;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -73,7 +89,14 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener {
         int width = wm.getDefaultDisplay().getWidth();
         int height = wm.getDefaultDisplay().getHeight();
         Log.e("HomeActivity", "screen width=" + width + ",height=" + height);
+
+        //test
+
     }
+
+
+
+
 
     @Override
     public void setContentViewId() {
@@ -100,6 +123,7 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener {
         findViewById(R.id.btn_remote).setOnClickListener(this);
         findViewById(R.id.btn_syncDown).setOnClickListener(this);
         findViewById(R.id.btn_syncUp).setOnClickListener(this);
+        findViewById(R.id.btn_mgr).setOnClickListener(this);
         downSpinner = (Spinner) findViewById(R.id.sp_download);
         upSpinner = (Spinner) findViewById(R.id.sp_upload);
     }
@@ -107,17 +131,31 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener {
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
+            case R.id.btn_mgr:
+                startActivity(new Intent(this, MgrActivity.class));
+                break;
             case R.id.btn_native:
                 startActivity(new Intent(this, LocalActivity.class));
                 break;
             case R.id.btn_remote:
                 showRemoteConfigDialog();
                 break;
-
             case R.id.btn_syncDown:
+                if (TextUtils.isEmpty(remoteDb) || TextUtils.isEmpty(remoteIP)
+                        || TextUtils.isEmpty(loginPsw) || TextUtils.isEmpty(loginName)) {
+                    editRemoteConfigDialog();
+                    return;
+                }
+                currentMotivation = DOWNLOAD;
                 checkDb(DOWNLOAD);
                 break;
             case R.id.btn_syncUp:
+                if (TextUtils.isEmpty(remoteDb) || TextUtils.isEmpty(remoteIP)
+                        || TextUtils.isEmpty(loginPsw) || TextUtils.isEmpty(loginName)) {
+                    editRemoteConfigDialog();
+                    return;
+                }
+                currentMotivation = UPNLOAD;
                 checkDb(UPNLOAD);
                 break;
             case R.id.btn_confirm:
@@ -136,8 +174,80 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener {
         }
     }
 
+    private void showAlertDialog() {
+        mAlertDialog = new AlertDialog.Builder(this).create();
+        mAlertDialog.setContentView(R.layout.dialog_alert);
+        View.OnClickListener onClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                switch (v.getId()) {
+                    case R.id.btn_cancel:
+                        mAlertDialog.dismiss();
+                        break;
+                    case R.id.btn_confirm:
+                        checkDb(currentMotivation);
+                        break;
+                }
+            }
+        };
+        mAlertDialog.findViewById(R.id.btn_cancel).setOnClickListener(onClickListener);
+        mAlertDialog.findViewById(R.id.btn_confirm).setOnClickListener(onClickListener);
+        mAlertDialog.show();
+
+    }
+
+    private void dismissAlertDialog() {
+        if (mAlertDialog != null)
+            mAlertDialog.dismiss();
+    }
+
+    /**
+     * 编辑连接
+     */
+    private void editRemoteConfigDialog() {
+        mEditRemoteConfigDialog = new Dialog(this, R.style.dialog_style);
+        mEditRemoteConfigDialog.setContentView(R.layout.edit_dialog_remote_config);
+        mEditRemoteConfigDialog.setCanceledOnTouchOutside(false);
+        etIP = (EditText) mEditRemoteConfigDialog.findViewById(R.id.et_ip);
+        etName = (EditText) mEditRemoteConfigDialog.findViewById(R.id.et_name);
+        etPsw = (EditText) mEditRemoteConfigDialog.findViewById(R.id.et_psw);
+        etDb = (EditText) mEditRemoteConfigDialog.findViewById(R.id.et_database);
+        View.OnClickListener onClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                switch (v.getId()) {
+                    case R.id.btn_edit_cancel:
+                        mEditRemoteConfigDialog.dismiss();
+                        break;
+                    case R.id.btn_save:
+                        remoteIP = etIP.getText().toString().trim();
+                        loginName = etName.getText().toString().trim();
+                        loginPsw = etPsw.getText().toString().trim();
+                        remoteDb = etDb.getText().toString().trim();
+                        saveParams();
+                        showAlertDialog();
+                        break;
+                }
+            }
+        };
+        mEditRemoteConfigDialog.findViewById(R.id.btn_edit_cancel).setOnClickListener(onClickListener);
+        mEditRemoteConfigDialog.findViewById(R.id.btn_save).setOnClickListener(onClickListener);
+        mEditRemoteConfigDialog.show();
+    }
+
+
+    private void saveParams() {
+        SharedPreferences preferences = getSharedPreferences(DbConstants.SHARED_PREFENCES, Context.MODE_PRIVATE);
+        SharedPreferences.Editor edit = preferences.edit();
+        edit.putString(DbConstants.REMOTE_IP, remoteIP);
+        edit.putString(DbConstants.REMTOE_DB, remoteDb);
+        edit.putString(DbConstants.LOGIN_NAME, loginName);
+        edit.putString(DbConstants.LOGIN_PSW, loginPsw);
+        edit.commit();
+    }
+
     private void showRemoteConfigDialog() {
-        remoteConfigDialog = new Dialog(this);
+        remoteConfigDialog = new Dialog(this, R.style.dialog_style);
         remoteConfigDialog.setContentView(R.layout.dialog_remote_config);
         remoteConfigDialog.setCanceledOnTouchOutside(false);
         etIP = (EditText) remoteConfigDialog.findViewById(R.id.et_ip);
@@ -153,7 +263,7 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener {
         remoteConfigDialog.show();
     }
 
-    private void dismissRemoteConfigDialog(){
+    private void dismissRemoteConfigDialog() {
         if (remoteConfigDialog != null) {
             remoteConfigDialog.dismiss();
         }
@@ -295,16 +405,10 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener {
                         @Override
                         public void run() {
                             Toast.makeText(HomeActivity.this, "连接成功", Toast.LENGTH_SHORT).show();
-                            SharedPreferences preferences = getSharedPreferences(DbConstants.SHARED_PREFENCES, Context.MODE_PRIVATE);
-                            SharedPreferences.Editor edit = preferences.edit();
-                            edit.putString(DbConstants.REMOTE_IP, remoteIP);
-                            edit.putString(DbConstants.REMTOE_DB, remoteDb);
-                            edit.putString(DbConstants.LOGIN_NAME, loginName);
-                            edit.putString(DbConstants.LOGIN_PSW, loginPsw);
-                            edit.commit();
+                            saveParams();
                         }
                     });
-                    startActivity(new Intent(HomeActivity.this, RemoteActivity.class));
+                    startActivity(new Intent(HomeActivity.this, MgrActivity.class));
                 } else {
                     runOnUiThread(new Runnable() {
                         @Override

@@ -62,7 +62,7 @@ public class LocalActivity extends BaseActivity implements View.OnClickListener 
             case R.id.btn_add:
                 String addPrice = etAddPrice.getText().toString().trim();
                 String addSerial = etAddSerial.getText().toString().trim();
-                boolean add = blackDAO.add(addSerial, addPrice);
+                boolean add = blackDAO.add(addSerial, addPrice, "", "", 0);
                 Toast.makeText(this, add ? "添加成功" : "添加失败", Toast.LENGTH_SHORT).show();
                 updateData();
                 break;
@@ -99,7 +99,7 @@ public class LocalActivity extends BaseActivity implements View.OnClickListener 
         String result = "";
         for (int i = 0; i < all.size(); i++) {
             ShopInfo shopInfo = all.get(i);
-            result += shopInfo.serial + " : ";
+            result += shopInfo.name + " : ";
             result += shopInfo.price + "\n";
         }
         tvResult.setText(result);

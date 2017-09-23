@@ -132,7 +132,7 @@ public class RemoteActivity extends BaseActivity implements View.OnClickListener
                                     result = "查询结果：\n";
                                     for (int i = 0; i < query.size(); i++) {
                                         ShopInfo shopInfo = query.get(i);
-                                        result += shopInfo.serial + " : ";
+                                        result += shopInfo.name + " : ";
                                         result += shopInfo.price + "\n";
                                     }
                                     tvQueryResult.setText(result);
@@ -173,7 +173,7 @@ public class RemoteActivity extends BaseActivity implements View.OnClickListener
         result = "";
         for (int i = 0; i < all.size(); i++) {
             ShopInfo shopInfo = all.get(i);
-            result += shopInfo.serial + " : ";
+            result += shopInfo.name + " : ";
             result += shopInfo.price + "\n";
         }
         runOnUiThread(new Runnable() {

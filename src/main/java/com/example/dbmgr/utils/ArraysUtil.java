@@ -40,6 +40,7 @@ public class ArraysUtil {
      */
     public static int compare(List<String> list1, List<String> list2) {
         int isEqaul = DbConstants.DB_EQUAL;
+        if (list1 == null || list2 == null) return DbConstants.DB_EMPTY;
         if (list1.size() != list2.size()) {
             isEqaul = DbConstants.DB_NOT_EQAUL;
         } else if (list1.size() == 0) {
@@ -65,7 +66,7 @@ public class ArraysUtil {
             if (base.contains(shopInfo)) {
                 continue;
             } else {
-                int index = hasSerail(base, shopInfo.serial);
+                int index = hasSerail(base, shopInfo.name);
                 if (index != -1) {
                     //如果存在相同serial则更新
                     base.remove(index);
@@ -82,7 +83,7 @@ public class ArraysUtil {
     private static int hasSerail(ArrayList<ShopInfo> base, String serial) {
         if (base == null) return -1;
         for (int i = 0; i < base.size(); i++) {
-            if (TextUtils.equals(serial, base.get(i).serial)) {
+            if (TextUtils.equals(serial, base.get(i).name)) {
                 return i;
             }
         }

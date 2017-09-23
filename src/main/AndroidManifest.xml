@@ -1,9 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.example.dbmgr">
 
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.MOUNT_FORMAT_FILESYSTEMS"/>
+    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS"/>
+    <uses-permission android:name="android.permission.WRITE_MEDIA_STORAGE"
+        tools:ignore="ProtectedPermissions" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <uses-permission android:name="android.hardware.usb.host" android:required="false" />
+    <!--因为部分手机上是没有otg的所以需要加入特性。-->
+    <uses-feature android:name="android.hardware.usb.host" android:required="true" />
     <application
         android:allowBackup="true"
         android:icon="@mipmap/logo"
@@ -24,6 +36,22 @@
         <activity android:name=".activity.RemoteActivity" />
         <activity android:name=".activity.BaseActivity" />
         <activity android:name=".activity.HelpActivity"/>
+        <activity android:name=".activity.MgrActivity"/>
+
+        <!--<receiver android:name=".receiver.USBDiskReceiver">-->
+            <!--<intent-filter android:priority="1000">-->
+                <!--<action android:name="android.intent.action.MEDIA_MOUNTED"/>-->
+                <!--<action android:name="android.intent.action.MEDIA_UNMOUNTED"/>-->
+                <!--<action android:name="android.hardware.usb.action.USB_STATE"/>-->
+                <!--<data android:scheme="file"/>-->
+            <!--</intent-filter>-->
+        <!--</receiver>-->
+       <receiver android:name=".receiver.USBBroadcastReceiver">
+          <intent-filter android:priority="800">
+              <!--监测USB数据线的插入-->
+              <action android:name="android.hardware.usb.action.USB_STATE"/>
+           </intent-filter>
+       </receiver>
     </application>
 
 </manifest>

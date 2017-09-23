@@ -5,6 +5,7 @@
     android:layout_height="match_parent">
 
     <LinearLayout
+        android:background="#0f0"
         android:layout_alignParentTop="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -15,12 +16,12 @@
             android:layout_height="@dimen/actionbar_height"
             android:layout_alignParentTop="true"
             actionBar:actionbar_background="@color/green"
-            actionBar:rightImage="@mipmap/help"
             actionBar:title="使用帮助">
 
         </com.example.dbmgr.widget.ActionBarView>
 
         <TextView
+            android:background="#f00"
             android:id="@+id/tips"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

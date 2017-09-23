@@ -5,18 +5,26 @@ package com.example.dbmgr.db;
  */
 
 public class ShopInfo {
-    public String serial;
+    public String name;
     public String price;
-    public ShopInfo(String serial, String price) {
-        this.serial = serial;
-        this.price = price + "";
+    public String unit;
+    public int count;
+
+
+    public ShopInfo(String name, String unit, String price, int count) {
+        this.name = name;
+        this.price = price;
+        this.unit = unit;
+        this.count = count;
     }
 
     @Override
     public String toString() {
         return "ShopInfo{" +
-                "serial='" + serial + '\'' +
+                "name='" + name + '\'' +
                 ", price='" + price + '\'' +
+                ", unit='" + unit + '\'' +
+                ", count=" + count +
                 '}';
     }
 }

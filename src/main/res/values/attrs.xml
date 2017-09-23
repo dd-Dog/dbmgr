@@ -2,8 +2,7 @@
 <resources>
 
     <declare-styleable name="actionBarAttrs">
-        <attr name="title" format="string"></attr>
-        <attr name="rightImage" format="reference"></attr>
-        <attr name="actionbar_background" format="color"></attr>
+        <attr name="title" format="string"/>
+        <attr name="actionbar_background" format="color"/>
     </declare-styleable>
 </resources>

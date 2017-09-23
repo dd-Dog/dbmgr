@@ -23,4 +23,14 @@
         <item>4.同步分为下载和上传，下载指从远端同步到手机，对手机数据库进行操作，上传则相反</item>
         <item>5.上传和下载分别设有两种同步模式：清除和追加；清除是指清除被操作的数据表，再添加;追加是指在被操作的数据表基础上进行合并</item>
     </array>
+
+    <array name="dbColums">
+        <item>serialnum</item>
+        <item>price</item>
+        <item>product</item>
+        <item>unit</item>
+    </array>
+    <array name="dbTypes">
+        <item></item>
+    </array>
 </resources>

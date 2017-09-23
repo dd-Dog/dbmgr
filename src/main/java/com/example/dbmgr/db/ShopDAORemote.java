@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.example.dbmgr.utils.ArraysUtil;
@@ -129,7 +130,47 @@ public class ShopDAORemote {
             stmt = conn.createStatement();
             ResultSet resultSet = stmt.executeQuery("select * FROM " + DbConstants.TABLE_NAME + "where serialnum=" + serail);
             while (resultSet.next()) {
-                list.add(new ShopInfo(resultSet.getString(1), resultSet.getString(2)));
+                list.add(new ShopInfo(resultSet.getString(1), resultSet.getString(2), resultSet.getString(3),resultSet.getInt(4)));
+            }
+            return list;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        } finally {
+            try {
+                conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * 根据ID查询
+     *
+     * @return
+     */
+    public ArrayList<ShopInfo> findById(String id) {
+        Statement stmt = null;
+        ArrayList<ShopInfo> list = new ArrayList<>();
+        try {
+            if (conn == null || conn.isClosed())
+                conn = DriverManager.getConnection("jdbc:jtds:sqlserver://" + remoteIP + ":1433/" + remoteDb, loginName, loginPsw);
+            stmt = conn.createStatement();
+            String query = "select table_name FROM " + DbConstants.TABLE_NAME + " where product_id='" + id + "'";
+            Log.e(TAG, "query=" + query);
+            ResultSet tableNameSet = stmt.executeQuery(query);
+            String table_name = "";
+            if (tableNameSet.next()) {
+                table_name = tableNameSet.getString(1);
+            }
+            Log.e(TAG, "table_name=" + table_name);
+            if (TextUtils.equals("", table_name)) {
+                return null;
+            }
+            ResultSet resultSet = stmt.executeQuery("select * from " + table_name);
+            while (resultSet.next()) {
+                list.add(new ShopInfo(resultSet.getString(1), resultSet.getString(2), resultSet.getString(3), resultSet.getInt(4)));
             }
             return list;
         } catch (Exception e) {
@@ -158,7 +199,7 @@ public class ShopDAORemote {
             stmt = conn.createStatement();
             ResultSet resultSet = stmt.executeQuery("select * FROM " + DbConstants.TABLE_NAME);
             while (resultSet.next()) {
-                list.add(new ShopInfo(resultSet.getString(1), resultSet.getString(2)));
+                list.add(new ShopInfo(resultSet.getString(1), resultSet.getString(2), resultSet.getString(3), resultSet.getInt(4)));
             }
             return list;
         } catch (Exception e) {
@@ -226,8 +267,11 @@ public class ShopDAORemote {
                     conn.prepareStatement("INSERT INTO " + DbConstants.TABLE_NAME + " VALUES(?,?)");
             for (int i = 0; i < localData.size(); i++) {
                 shopInfo = localData.get(i);
-                preparedStatement.setString(1, shopInfo.serial);
-                preparedStatement.setString(2, shopInfo.price);
+                preparedStatement.setString(1, shopInfo.name);
+                preparedStatement.setString(2, shopInfo.unit);
+                preparedStatement.setString(3, shopInfo.price);
+                preparedStatement.setInt(3, shopInfo.count);
+
                 int result = preparedStatement.executeUpdate();
                 if (result > 0) {
                     Log.e(TAG, "添加成功");
@@ -253,7 +297,7 @@ public class ShopDAORemote {
     public void append(ArrayList<ShopInfo> localData) {
         Statement stmt;
         ArrayList<ShopInfo> union = null;
-                //查询远端数据表
+        //查询远端数据表
         ArrayList<ShopInfo> remoteData = findAll();
         try {
             if (conn == null || conn.isClosed())

@@ -33,13 +33,15 @@ public class ShopDAO {
      * @param type
      * @return
      */
-    public boolean add(String number, String type) {
+    public boolean add(String number, String type, String product, String unit, int count) {
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
         long id = -1;
         if (db != null) {
             ContentValues values = new ContentValues();
             values.put("serialnum", number);
             values.put("price", type);
+            values.put("product", product);
+            values.put("unit", unit);
             // 参1 表明 参2数据为空时的默认值 参3要添加的数据
             id = db.insert(DbConstants.TABLE_NAME, null, values);
             db.close();
@@ -47,6 +49,26 @@ public class ShopDAO {
         return id != -1;
     }
 
+    /**
+     * 添加一条
+     *
+     * @return
+     */
+    public boolean add(ShopInfo shopInfo) {
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        long id = -1;
+        if (db != null) {
+            ContentValues values = new ContentValues();
+            values.put("name", shopInfo.name);
+            values.put("unit", shopInfo.unit);
+            values.put("price", shopInfo.price);
+            values.put("count",shopInfo.count);
+            // 参1 表明 参2数据为空时的默认值 参3要添加的数据
+            id = db.insert(DbConstants.TABLE_NAME, null, values);
+            db.close();
+        }
+        return id != -1;
+    }
     /**
      * 删除一条
      *
@@ -133,8 +155,10 @@ public class ShopDAO {
             if (cursor != null) {
                 while (cursor.moveToNext()) {
                     String number = cursor.getString(0);
-                    String type = cursor.getString(1);
-                    ShopInfo info = new ShopInfo(number, type);
+                    String unit = cursor.getString(1);
+                    String price = cursor.getString(2);
+                    int count = cursor.getInt(3);
+                    ShopInfo info = new ShopInfo(number, unit, price,count);
                     infos.add(info);
                 }
                 cursor.close();
@@ -192,8 +216,10 @@ public class ShopDAO {
             for (int i = 0; i < remoteData.size(); i++) {
                 shopInfo = remoteData.get(i);
                 values = new ContentValues();
-                values.put("serialnum", shopInfo.serial);
+                values.put("name", shopInfo.name);
+                values.put("unit", shopInfo.unit);
                 values.put("price", shopInfo.price);
+                values.put("count", shopInfo.count);
                 // 参1 表明 参2数据为空时的默认值 参3要添加的数据
                 id = db.insert(DbConstants.TABLE_NAME, null, values);
                 if (id <= 0) {
@@ -218,8 +244,10 @@ public class ShopDAO {
             if (cursor != null) {
                 while (cursor.moveToNext()) {
                     String number = cursor.getString(0);
-                    String type = cursor.getString(1);
-                    ShopInfo info = new ShopInfo(number, type);
+                    String unit = cursor.getString(1);
+                    String price = cursor.getString(2);
+                    int count = cursor.getInt(3);
+                    ShopInfo info = new ShopInfo(number, unit, price, count);
                     infos.add(info);
                 }
                 cursor.close();
@@ -258,9 +286,9 @@ public class ShopDAO {
 //					ShopInfo info = new ShopInfo(number, type);
 //					infos.add(info);
 //				}
-//				cursor.close();
+//				cursor.arrow();
 //			}
-//			db.close();
+//			db.arrow();
 //		}
 //		return infos;
 //	}
